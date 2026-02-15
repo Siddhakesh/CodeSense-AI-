@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Explain Any Codebase</title>
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Highlight.js -->
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/static/style.css?v=6">
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
+</head>
+
+<body>
+
+    <!-- App Shell -->
+    <div class="app-shell">
+
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="brand">
+                <span class="brand-icon">&lt;/&gt;</span>
+                <span class="brand-text">Code<span class="accent-text">Explain</span></span>
+            </div>
+
+            <nav class="nav-menu">
+                <button class="nav-item active" data-mode="repo">
+                    <span class="nav-icon">📦</span>
+                    <span class="nav-label">Repository</span>
+                </button>
+                <button class="nav-item" data-mode="profile" id="profileNavBtn" style="display: none;">
+                    <span class="nav-icon">👤</span>
+                    <span class="nav-label">Profile</span>
+                </button>
+                <div class="nav-divider"></div>
+                <button class="nav-item" data-mode="history">
+                    <span class="nav-icon">📜</span>
+                    <span class="nav-label">History</span>
+                </button>
+                <div class="nav-divider"></div>
+                <a href="/login" class="nav-item" id="loginBtn" style="text-decoration: none;">
+                    <span class="nav-icon">🔑</span>
+                    <span class="nav-label">Login</span>
+                </a>
+                <button class="nav-item" id="logoutBtn" style="display: none;">
+                    <span class="nav-icon">🚪</span>
+                    <span class="nav-label">Logout</span>
+                </button>
+            </nav>
+
+            <div class="sidebar-footer">
+                v0.1.0 • Gemini Pro
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+
+            <!-- Top Bar / Input Area -->
+            <header class="top-bar">
+                <form id="ingestForm" class="search-container">
+                    <div class="input-wrapper">
+                        <span class="search-icon">🔍</span>
+                        <input type="text" id="repoUrl" placeholder="Paste GitHub Repository URL..." required
+                            autocomplete="off">
+                    </div>
+                    <button type="submit" id="analyzeBtn" class="action-btn">
+                        <span class="btn-text">Analyze</span>
+                        <span class="btn-loader" style="display: none;">Wait...</span>
+                    </button>
+                </form>
+            </header>
+
+            <!-- Dashboard Content Area -->
+            <div class="dashboard-grid">
+
+                <!-- Welcome State -->
+                <div id="welcomeState" class="welcome-card">
+                    <div class="welcome-content">
+                        <h1>Unlock Codebase Insights</h1>
+                        <p class="app-description">
+                            Instantly analyze any GitHub repository or user profile. Get AI-powered explanations,
+                            visualize file structures, and explore dependency graphs in a unified dashboard.
+                        </p>
+                        <div class="feature-pills">
+                            <span class="pill">⚡ Instant Analysis</span>
+                            <span class="pill">🤖 AI Explanation</span>
+                            <span class="pill">📊 Visual Stats</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Error Container -->
+                <div id="error" class="error-banner" style="display: none;">
+                    <span class="error-icon">⚠️</span>
+                    <span id="errorMessage"></span>
+                </div>
+
+                <!-- Repo Analysis Results -->
+                <div id="results" class="results-container" style="display: none;">
+
+                    <!-- Stats Row -->
+                    <div class="stats-row">
+                        <div class="stat-card">
+                            <div class="stat-label">Repository</div>
+                            <div class="stat-value" id="repoName">-</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Framework</div>
+                            <div class="stat-value highlight" id="framework">-</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Files</div>
+                            <div class="stat-value" id="totalFiles">-</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Last Indexed</div>
+                            <div class="stat-value tiny" id="indexedAt">-</div>
+                        </div>
+                    </div>
+
+                    <!-- Main Bento Grid -->
+                    <div class="bento-grid">
+
+                        <!-- Chat Module (Large) -->
+                        <div class="bento-card chat-card">
+                            <div class="card-header">
+                                <h3>💬 AI Assistant</h3>
+                            </div>
+                            <div id="chatMessages" class="chat-viewport custom-scrollbar">
+                                <div class="message ai-message">
+                                    <div class="message-content markdown-body">
+                                        Hello! I'm ready to explain this codebase. What would you like to know?
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="chat-input-area">
+                                <textarea id="chatInput" rows="1"
+                                    placeholder="Ask about architecture, bugs, or logic..."></textarea>
+                                <button id="sendMessageBtn" class="send-btn">➤</button>
+                            </div>
+                        </div>
+
+                        <!-- Right Column Stack -->
+                        <div class="side-stack">
+                            <!-- Language Chart -->
+                            <div class="bento-card">
+                                <div class="card-header">
+                                    <h3>📊 Languages</h3>
+                                </div>
+                                <div class="chart-container">
+                                    <canvas id="langChart"></canvas>
+                                </div>
+                            </div>
+
+                            <!-- File Explorer -->
+                            <div class="bento-card flex-grow">
+                                <div class="card-header">
+                                    <h3>📁 Files</h3>
+                                </div>
+                                <div id="filesList" class="file-list-view custom-scrollbar"></div>
+                            </div>
+                        </div>
+
+                        <!-- Dependency Graph (Full Width Bottom) -->
+                        <div class="bento-card full-span">
+                            <div class="card-header">
+                                <h3>🔗 Dependencies</h3>
+                            </div>
+                            <div id="depGraph" class="graph-view custom-scrollbar"></div>
+                        </div>
+                    </div>
+
+                    <button id="closeResults" class="floating-close" title="Clear Analysis">&times;</button>
+                </div>
+
+                <!-- Profile Analysis Results -->
+                <div id="profileResults" class="results-container" style="display: none;">
+
+                    <!-- Profile Header Card -->
+                    <div class="bento-card profile-header">
+                        <img id="profileAvatar" src="" alt="Avatar" class="avatar-large">
+                        <div class="profile-info">
+                            <h2 id="profileName"></h2>
+                            <p id="profileUsername" class="username-tag"></p>
+                            <p id="profileBio" class="bio-text"></p>
+                        </div>
+                        <div class="profile-metrics">
+                            <div class="metric">
+                                <span id="profileRepos" class="metric-val">0</span>
+                                <span class="metric-label">Repos</span>
+                            </div>
+                            <div class="metric">
+                                <span id="profileFollowers" class="metric-val">0</span>
+                                <span class="metric-label">Followers</span>
+                            </div>
+                            <div class="metric">
+                                <span id="profileFollowing" class="metric-val">0</span>
+                                <span class="metric-label">Following</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- AI Summary -->
+                    <div id="profileSummarySection" class="bento-card full-span summary-card" style="display: none;">
+                        <div class="card-header">
+                            <h3>✨ Professional Summary</h3>
+                        </div>
+                        <div id="profileSummary" class="summary-content markdown-body"></div>
+                    </div>
+
+                    <div class="bento-grid">
+                        <div class="bento-card">
+                            <div class="card-header">
+                                <h3>💻 Tech Stack</h3>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="profileLangChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="bento-card">
+                            <div class="card-header">
+                                <h3>🏆 Top Repositories</h3>
+                            </div>
+                            <div id="topReposList" class="repo-list-view custom-scrollbar"></div>
+                        </div>
+                    </div>
+
+                    <button id="closeProfileResults" class="floating-close" title="Clear Analysis">&times;</button>
+                </div>
+
+            </div>
+            <!-- Auth Modal -->
+            <div id="authModal" class="modal" style="display: none;">
+                <div class="modal-content bento-card">
+                    <span class="close-modal">&times;</span>
+                    <h2 id="authTitle">Login</h2>
+                    <form id="authForm" class="auth-form">
+                        <div class="form-group">
+                            <label for="username">Username</label>
+                            <input type="text" id="username" name="username" required>
+                        </div>
+                        <div class="form-group" id="emailGroup" style="display: none;">
+                            <label for="email">Email</label>
+                            <input type="email" id="email" name="email">
+                            <small
+                                style="display: block; margin-top: 0.25rem; font-size: 0.8rem; color: var(--text-muted);">
+                                Use an email containing "hr" to get HR access.
+                            </small>
+                        </div>
+                        <div class="form-group">
+                            <label for="password">Password</label>
+                            <input type="password" id="password" name="password" required>
+                        </div>
+                        <button type="submit" class="action-btn" style="width: 100%; margin-top: 1rem;">
+                            <span id="authSubmitText">Login</span>
+                        </button>
+                    </form>
+                    <p class="auth-switch">
+                        <span id="authSwitchText">Don't have an account?</span>
+                        <a href="#" id="authSwitchLink">Sign Up</a>
+                    </p>
+                </div>
+            </div>
+
+            <!-- History Results -->
+            <div id="historyResults" class="results-container" style="display: none;">
+                <div class="results-header">
+                    <h2>Analysis History</h2>
+                    <button id="clearHistoryBtn" class="close-btn" style="width: auto; padding: 0 1rem;">Clear
+                        History</button>
+                </div>
+
+                <div id="historyList" class="history-list">
+                    <!-- History items will be injected here -->
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="/static/app.js?v=9"></script>
+
+</body>
+
+</html>

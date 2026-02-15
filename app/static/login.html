@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login - Explain Any Codebase</title>
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/static/style.css">
+    <style>
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: var(--bg-body);
+        }
+
+        .login-card {
+            width: 100%;
+            max-width: 400px;
+            padding: 2.5rem;
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .brand {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            text-align: center;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .brand-icon {
+            color: var(--primary-color);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="login-card">
+        <div class="brand">
+            <span class="brand-icon">&lt;/&gt;</span>
+            <span class="brand-text">Code<span class="accent-text">Explain</span></span>
+        </div>
+
+        <h2 id="authTitle" style="text-align: center; margin-bottom: 1.5rem; color: var(--text-primary);">Login</h2>
+
+        <form id="authForm" class="auth-form">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" required>
+            </div>
+            <div class="form-group" id="emailGroup" style="display: none;">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email">
+                <small style="display: block; margin-top: 0.25rem; font-size: 0.8rem; color: var(--text-muted);">
+                    Use an email containing "hr" to get HR access.
+                </small>
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+
+            <div id="errorMsg"
+                style="color: #f43f5e; font-size: 0.9rem; margin-bottom: 1rem; display: none; text-align: center;">
+            </div>
+
+            <button type="submit" class="action-btn" style="width: 100%; margin-top: 0.5rem;">
+                <span id="authSubmitText">Login</span>
+            </button>
+        </form>
+
+        <p class="auth-switch" style="text-align: center; margin-top: 1.5rem; color: var(--text-secondary);">
+            <span id="authSwitchText">Don't have an account?</span>
+            <a href="#" id="authSwitchLink"
+                style="color: var(--primary-color); text-decoration: none; font-weight: 500;">Sign Up</a>
+        </p>
+    </div>
+
+    <script src="/static/login.js"></script>
+</body>
+
+</html>
